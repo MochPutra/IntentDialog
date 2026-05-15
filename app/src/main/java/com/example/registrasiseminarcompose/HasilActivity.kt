@@ -27,6 +27,7 @@ class HasilActivity : ComponentActivity() {
         val nim = intent.getStringExtra("NIM") ?: ""
         val prodi = intent.getStringExtra("PRODI") ?: ""
         val email = intent.getStringExtra("EMAIL") ?: ""
+        val nohp = intent.getStringExtra("NOHP") ?: ""
 
         setContent {
             MaterialTheme {
@@ -39,10 +40,11 @@ class HasilActivity : ComponentActivity() {
                         nim = nim,
                         prodi = prodi,
                         email = email,
+                        nohp = nohp,
                         onOpenWebsite = {
                             val browserIntent = Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://www.ummi.ac.id")
+                                Uri.parse("https://ifummi.id/")
                             )
                             startActivity(browserIntent)
                         }
@@ -59,6 +61,7 @@ fun HasilRegistrasiScreen(
     nim: String,
     prodi: String,
     email: String,
+    nohp: String,
     onOpenWebsite: () -> Unit
 ) {
     Column(
@@ -76,6 +79,7 @@ fun HasilRegistrasiScreen(
         Text(text = "NIM : $nim")
         Text(text = "Prodi : $prodi")
         Text(text = "Email : $email")
+        Text(text = "No. HP : $nohp")
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onOpenWebsite,

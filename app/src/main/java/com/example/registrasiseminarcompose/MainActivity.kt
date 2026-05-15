@@ -6,20 +6,25 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
@@ -31,12 +36,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    FormRegistrasiScreen(onSubmit = { nama, nim, prodi, email ->
+                    FormRegistrasiScreen(onSubmit = { nama, nim, prodi, email, nohp ->
                         val intent = Intent(this, HasilActivity::class.java).apply {
                             putExtra("NAMA", nama)
                             putExtra("NIM", nim)
                             putExtra("PRODI", prodi)
                             putExtra("EMAIL", email)
+                            putExtra("NOHP", nohp)
                         }
                         startActivity(intent)
                     })
@@ -47,13 +53,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun FormRegistrasiScreen(onSubmit: (String, String, String, String) -> Unit) {
+fun FormRegistrasiScreen(onSubmit: (String, String, String, String, String) -> Unit) {
     var nama by remember { mutableStateOf("") }
     var nim by remember { mutableStateOf("") }
     var prodi by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var nohp by remember { mutableStateOf("") }
     var showWarningDialog by remember { mutableStateOf(false) }
     var showConfirmDialog by remember { mutableStateOf(false) }
+    var showResetDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -97,19 +105,42 @@ fun FormRegistrasiScreen(onSubmit: (String, String, String, String) -> Unit) {
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth()
         )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = nohp,
+            onValueChange = { nohp = it },
+            label = { Text("Nomor Telepon") },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+        )
         Spacer(modifier = Modifier.height(20.dp))
 
-        Button(
-            onClick = {
-                if (nama.isBlank() || nim.isBlank() || prodi.isBlank() || email.isBlank()) {
-                    showWarningDialog = true
-                } else {
-                    showConfirmDialog = true
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("Daftar Seminar")
+            Button(
+                onClick = {
+                    if (nama.isBlank() || nim.isBlank() || prodi.isBlank() || email.isBlank() || nohp.isBlank()) {
+                        showWarningDialog = true
+                    } else {
+                        showConfirmDialog = true
+                    }
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Daftar")
+            }
+
+            OutlinedButton(
+                onClick = {
+                    showResetDialog = true
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Reset")
+            }
         }
     }
 
@@ -134,7 +165,7 @@ fun FormRegistrasiScreen(onSubmit: (String, String, String, String) -> Unit) {
             confirmButton = {
                 TextButton(onClick = {
                     showConfirmDialog = false
-                    onSubmit(nama, nim, prodi, email)
+                    onSubmit(nama, nim, prodi, email, nohp)
                 }) {
                     Text("Ya")
                 }
@@ -142,6 +173,33 @@ fun FormRegistrasiScreen(onSubmit: (String, String, String, String) -> Unit) {
             dismissButton = {
                 TextButton(onClick = {
                     showConfirmDialog = false
+                }) {
+                    Text("Batal")
+                }
+            }
+        )
+    }
+
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("Konfirmasi Reset") },
+            text = { Text("Apakah Anda yakin ingin menghapus seluruh data input?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    nama = ""
+                    nim = ""
+                    prodi = ""
+                    email = ""
+                    nohp = ""
+                    showResetDialog = false
+                }) {
+                    Text("Ya")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showResetDialog = false
                 }) {
                     Text("Batal")
                 }
